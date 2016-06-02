@@ -7,11 +7,19 @@ public class Heap<T> where T : IHeapItem<T>
     T[] items;
     int currentItemCount;
     
+    /// <summary>
+    /// Returns item T in the HeapIndex.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public bool Contains(T item)
     {
         return Equals(items[item.HeapIndex], item);
     }
 
+    /// <summary>
+    /// Returns the amount of items currently in the Heap.
+    /// </summary>
     public int Count
     {
         get
