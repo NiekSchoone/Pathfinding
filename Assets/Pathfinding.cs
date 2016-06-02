@@ -15,11 +15,22 @@ public class Pathfinding : MonoBehaviour
         nodeGrid = GetComponent<Grid>();
     }
 
+    /// <summary>
+    /// Starts a Coroutine which will find a path from start position to end position.
+    /// </summary>
+    /// <param name="startPos"></param>
+    /// <param name="targetPos"></param>
     public void StartFindPath(Vector3 startPos, Vector3 targetPos)
     {
         StartCoroutine(FindPath(startPos, targetPos));
     }
 
+    /// <summary>
+    /// Coroutine which is started in the "StartFindPath" method.
+    /// </summary>
+    /// <param name="startPosition"></param>
+    /// <param name="targetPosition"></param>
+    /// <returns></returns>
     IEnumerator FindPath(Vector3 startPosition, Vector3 targetPosition)
     {
         Vector3[] waypoints = new Vector3[0];
