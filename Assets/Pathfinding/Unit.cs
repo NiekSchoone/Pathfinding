@@ -27,7 +27,9 @@ public class Unit : MonoBehaviour
     {
         Vector3 currentWaypoint = path[0];
 
-        while(true)
+        Vector3 movementDirection = (currentWaypoint - transform.position).normalized;
+
+        while (true)
         {
             if(transform.position == currentWaypoint)
             {
@@ -39,7 +41,10 @@ public class Unit : MonoBehaviour
                     yield break;
                 }
                 currentWaypoint = path[targetIndex];
+                movementDirection = (currentWaypoint - transform.position).normalized;
+                transform.rotation = Quaternion.LookRotation(movementDirection);
             }
+
             transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, speed * Time.deltaTime);
             yield return null;
         }
@@ -52,7 +57,7 @@ public class Unit : MonoBehaviour
             for(int i = targetIndex; i < path.Length; i++)
             {
                 Gizmos.color = Color.blue;
-                Gizmos.DrawCube(path[i], Vector3.one*2);
+                Gizmos.DrawCube(path[i], Vector3.one);
                 if(i == targetIndex)
                 {
                     Gizmos.DrawLine(transform.position, path[i]);
