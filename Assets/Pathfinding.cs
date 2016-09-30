@@ -39,8 +39,17 @@ public class Pathfinding : MonoBehaviour
         Node startNode = nodeGrid.GetNodeFromWorldPoint(startPosition);
         Node targetNode = nodeGrid.GetNodeFromWorldPoint(targetPosition);
 
+        if(!targetNode.walkable) {
+            List<Node> targetNeigbours = nodeGrid.GetNeighbours(targetNode);
+            for (int i = 0; i < targetNeigbours.Count; i++) {
+                if(targetNeigbours[i].walkable) {
+                    targetNode = targetNeigbours[i];
+                    break;
+                }
+            }
+        }
 
-        if (startNode.walkable && targetNode.walkable)
+        if (targetNode.walkable)
         {
             Heap<Node> openSet = new Heap<Node>(nodeGrid.MaxSize);
             HashSet<Node> closedSet = new HashSet<Node>();
@@ -106,23 +115,23 @@ public class Pathfinding : MonoBehaviour
         }
     }
 
-    Vector3[] SimplifyPath(List<Node> path)
-    {
+    Vector3[] SimplifyPath(List<Node> path) {
         List<Vector3> waypoints = new List<Vector3>();
-        Vector2 oldDirection = Vector2.zero;
 
-        for (int i = 1; i < path.Count; i++)
-        {
-            Vector2 newDirection = new Vector2(path[i - 1].gridX - path[i].gridX, path[i - 1].gridY - path[i].gridY);
-            if(newDirection != oldDirection)
-            {
-                waypoints.Add(path[i].worldPostion);
+        Node checkPoint = path[0];
+        waypoints.Add(checkPoint.worldPostion);
+
+        for (int i = 1; i < path.Count; i++) {
+            Node currentPoint = path[i];
+            Node validPoint = path[i - 1];
+            if(!WalkableLine(checkPoint.worldPostion, currentPoint.worldPostion)) {
+                checkPoint = validPoint;
+                waypoints.Add(checkPoint.worldPostion);
             }
-            oldDirection = newDirection;
         }
         return waypoints.ToArray();
     }
- 
+
     Vector3[] RetracePath(Node startNode, Node endNode)
     {
         List<Node> path = new List<Node>();
@@ -136,5 +145,20 @@ public class Pathfinding : MonoBehaviour
         Vector3[] waypoints = SimplifyPath(path);
         Array.Reverse(waypoints);
         return waypoints;
+    }
+
+    bool WalkableLine(Vector3 pointA, Vector3 pointB) {
+        Vector3 dir = (pointB - pointA).normalized;
+        float distance = Vector3.Distance(pointA, pointB);
+
+        RaycastHit hitInfo;
+        Ray ray = new Ray(pointA, dir);
+
+        if(Physics.Raycast(ray, out hitInfo, distance)) {
+            if(hitInfo.collider.gameObject.layer == LayerMask.NameToLayer("Unwalkable")) {
+                return false;
+            }
+        }
+        return true;
     }
 }
